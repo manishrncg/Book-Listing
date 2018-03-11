@@ -48,7 +48,6 @@ class App extends React.Component{
 	}
 
 	addBookApi(dataJSON){
-		debugger;
 	    axios.post(apiEndPoint+'/add-book', {
 	      book_id: dataJSON.ISBN,
 	      user_id: this.getCookie('username'),

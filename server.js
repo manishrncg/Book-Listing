@@ -69,8 +69,10 @@ app.post('/add-user', function(req, res) {
 // Listen to POST requests to /users.
 app.post('/add-book', function(req, res) { // add book
   // console.log(req.body.book_id, req.body.user_id);
-  AddBook(req, res, connection);
-  res.end('Success yeah!');
+  var output = AddBook(req, res, connection);
+  console.log("after calling AddBook", output)
+ 
+  //res.end('Success yeah!');
 });
 
 app.post('/add-review', function(req, res) { // add review
