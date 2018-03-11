@@ -1,0 +1,25 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+class AddBookForm extends React.Component{
+
+	addAnotherBook(e){
+		e.preventDefault();
+		let newData = {name: this.bookTitle.value, ISBN: this.bookISBN.value, review:[]};
+		this.props.onSubmit(newData);
+	}
+
+	render (){
+		return(
+			<div>
+				<form onSubmit={ e => this.addAnotherBook(e)}>
+					<h3>Add book here</h3>
+					<input type="text" name="bookTitle" placeholder="Enter Book title" ref={ input => { this.bookTitle = input }}/>
+					<input type="number" name="bookISBN" placeholder="Enter Book ISBN No." ref={ input => { this.bookISBN = input }}/>
+					<input type="submit" />
+				</form>
+			</div>);
+	}
+}
+
+export default AddBookForm;
