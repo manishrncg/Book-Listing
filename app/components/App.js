@@ -1,15 +1,14 @@
 import React from 'react';
 import Book from './Book';
 import AddBookForm from './AddBookForm';
-import {apiEndPoint} from '../../config';
+import {apiEndPoint} from '../../config/config';
 import axios from 'axios';
 
 class App extends React.Component{
 	constructor(props){
 		super(props);
-		let data  = [{name: 'Book1', ISBN: 1234588, review: [{review: "j1", rating: "5"}, {review: "j1.1", rating: "5.1"}]}, {name: 'Book2', ISBN: 658686465, review: [{review: "j2", rating: "5"}]}, {name: 'Book3', ISBN: 846312, review: [{review: "j3", rating: "5"}]}, {name: 'Book4', ISBN: 79864443, review: [{review: "j4", rating: "5"}]}];
 		this.state = {
-			data: data
+			data: {}
 		};
 
 		this.addNewBook = this.addNewBook.bind(this);
@@ -33,11 +32,52 @@ class App extends React.Component{
 	    return "";
 	}
 
+	componentWillMount(){
+		let self = this;
+	    let data;
+
+		axios.post(apiEndPoint+'/get-books')
+	    .then(function (response) {
+	      console.log(response);
+	      let bookData = {};
+	      if(response.data){
+			response.data.map(i => bookData[i.book_id] = JSON.parse(i.book_data));
+			self.setState({
+				data: bookData
+			});
+			data = bookData
+	      }
+	    })
+	    .catch(function (error) {
+	      console.log(error);
+	    });
+
+	    axios.post(apiEndPoint+'/get-reviews')
+	    .then(function (response) {
+	      console.log(response);
+	      if(response.data){
+			response.data.map(i => data[i.book_id].review.push(JSON.parse(i.review)));
+			self.setState({
+				data: data
+			});
+	      }
+	    })
+	    .catch(function (error) {
+	      console.log(error);
+	    });
+	}
+
 	addNewBook(dataJSON){
-		let prevISBNcheck = this.state.data.filter(obj => obj.ISBN==dataJSON.ISBN);
-		if(prevISBNcheck.length==0){
+		let prevISBNcheck = Object.keys(this.state.data).filter(obj => obj==dataJSON.ISBN);
+
+		let data = Object.assign({}, this.state.data);
+		data[dataJSON.ISBN] = dataJSON;
+		if(dataJSON['name']=='' || dataJSON.ISBN==''){
+			alert('Book name or ISBN no. cannot be empty!');
+		}
+		else if(prevISBNcheck.length==0){
 			this.setState({
-				data: [...this.state.data, dataJSON]
+				data: data
 			});
 
 			this.addBookApi(dataJSON);
@@ -56,6 +96,11 @@ class App extends React.Component{
 	    })
 	    .then(function (response) {
 	      console.log(response);
+	      if(response.data['bookAdded']){
+			alert('Book added!');
+	      }else if(response.data['bookFound']){
+			alert('Book already exists!');
+	      }
 	    })
 	    .catch(function (error) {
 	      console.log(error);
@@ -63,23 +108,33 @@ class App extends React.Component{
 	}
 
 	addReview(dataJSON, index, isbn){
-			this.state.data[index].review.push(dataJSON);
-			this.setState({
-				data: this.state.data
-			});
+			if(dataJSON['review']=='' || dataJSON['rating']==''){
+				alert('Review or rating cannot be empty!');
+			}
+			else{
+				this.state.data[index].review.push(dataJSON);
+				this.setState({
+					data: this.state.data
+				});
 
-			axios.post(apiEndPoint+'/add-review', {
-		      book_id: isbn,
-		      user_id: this.getCookie('username'),
-		      review: dataJSON
-
-		    })
-		    .then(function (response) {
-		      console.log(response);
-		    })
-		    .catch(function (error) {
-		      console.log(error);
-		    });
+				axios.post(apiEndPoint+'/add-review', {
+			      book_id: isbn,
+			      user_id: this.getCookie('username'),
+			      review: dataJSON
+			    })
+			    .then(function (response) {
+			      console.log(response);
+			      if(response.data['status']>=1){
+					alert('Review has been added!');
+			      }
+			      else{
+					alert('Somethin went wrong!');
+			      }
+			    })
+			    .catch(function (error) {
+			      console.log(error);
+			    });
+			}
 	}
 
 	render (){
@@ -88,6 +143,7 @@ class App extends React.Component{
 						<h1 className="text-center">Book Review Panel</h1>
 							<ul>
 								{
+									Object.keys(this.state.data).length!=0 &&
 									Object.keys(this.state.data)
 										.map(
 											i => <Book key={i} 

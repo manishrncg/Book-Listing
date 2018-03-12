@@ -9,8 +9,8 @@ class DisplayBookReviews extends React.Component{
 		let review =this.props.review;
 		let index = Number(this.props.index)+1+'.) ';
 		return(<div>
-					<p>{index+review.rating}</p>
-					<p>{review.review}</p>
+					<p>{index+'. Rating: '+review.rating+' star'}</p>
+					<p>{'Review: '+review.review}</p>
 				</div>
 			);
 	}
