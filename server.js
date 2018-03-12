@@ -1,8 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const path = require('path');
-const AddBook = require('./AddBook');
-const AddReview = require('./AddReview');
+const AddBook = require('./api/AddBook');
+const AddReview = require('./api/AddReview');
+const GetBookData = require('./api/GetBookData');
+const GetReviews = require('./api/GetReviews');
+const dbConnectionDetails = require('./config/Dbconfig.js');
 
 const app = express();
 var allowCrossDomain = function(req, res, next) {
@@ -34,12 +37,7 @@ app.get('/', function (req, res) {
 const mysql = require('mysql');
 
 // Set up connection to database.
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'book_panel',
-});
+const connection = mysql.createConnection(dbConnectionDetails());
 
 
 // Connect to database.
@@ -68,7 +66,6 @@ app.post('/add-user', function(req, res) {
 
 // Listen to POST requests to /users.
 app.post('/add-book', function(req, res) { // add book
-  // console.log(req.body.book_id, req.body.user_id);
   var output = AddBook(req, res, connection);
   console.log("after calling AddBook", output)
  
@@ -77,7 +74,14 @@ app.post('/add-book', function(req, res) { // add book
 
 app.post('/add-review', function(req, res) { // add review
   AddReview(req, res, connection);
-  res.end('Success yeah!');
+});
+
+app.post('/get-books', function(req, res) { // add review
+  GetBookData(req, res, connection);
+});
+
+app.post('/get-reviews', function(req, res) { // add review
+  GetReviews(req, res, connection);
 });
 
 app.listen(process.env.PORT || 8081);

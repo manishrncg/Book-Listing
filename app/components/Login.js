@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {apiEndPoint} from '../../config';
+import {apiEndPoint} from '../../config/config';
 
 class Login extends React.Component {
 
@@ -15,7 +15,6 @@ class Login extends React.Component {
     e.preventDefault();
     let username = this.user_name.value;
     let validate =  this.validateName(username);
-    console.log(username);
     if(!validate){
       return false;
     }
@@ -26,11 +25,9 @@ class Login extends React.Component {
       username: username
     })
     .then(function (response) {
-      console.log(response);
       self.props.history.push(`/welcome/${username}`);
     })
     .catch(function (error) {
-      console.log(error);
     });
   }
 
