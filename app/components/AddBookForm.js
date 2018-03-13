@@ -12,7 +12,6 @@ class AddBookForm extends React.Component{
 	}
 
 	render (){
-		console.log(this.props.username);
 		return(
 			<div>
 				<form name="addBookForm" onSubmit={ e => this.addAnotherBook(e, this.props.username)}>
