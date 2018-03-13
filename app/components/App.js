@@ -13,7 +13,6 @@ class App extends React.Component{
 
 		this.addNewBook = this.addNewBook.bind(this);
 		this.addReview = this.addReview.bind(this);
-		this.getCookie = this.getCookie.bind(this);
 	}
 
 	getCookie(cname) {
@@ -41,7 +40,11 @@ class App extends React.Component{
 	      console.log(response);
 	      let bookData = {};
 	      if(response.data){
-			response.data.map(i => bookData[i.book_id] = JSON.parse(i.book_data));
+			response.data
+				.map(i => {
+					bookData[i.book_id] = JSON.parse(i.book_data),
+					bookData[i.book_id]['username'] = i.b_user_name
+				});
 			self.setState({
 				data: bookData
 			});
@@ -108,27 +111,29 @@ class App extends React.Component{
 	}
 
 	addReview(dataJSON, index, isbn){
+			let self = this;
+
 			if(dataJSON['review']=='' || dataJSON['rating']==''){
 				alert('Review or rating cannot be empty!');
 			}
 			else{
-				this.state.data[index].review.push(dataJSON);
-				this.setState({
-					data: this.state.data
-				});
-
 				axios.post(apiEndPoint+'/add-review', {
 			      book_id: isbn,
 			      user_id: this.getCookie('username'),
 			      review: dataJSON
 			    })
 			    .then(function (response) {
-			      console.log(response);
-			      if(response.data['status']>=1){
+				if(response.data['status']==0){
+					let newData = Object.assign({}, self.state.data);
+					newData[index].review.push(dataJSON);
+					self.setState({
+						data: newData
+					});
+
 					alert('Review has been added!');
 			      }
 			      else{
-					alert('Somethin went wrong!');
+					alert('You have already added the review!');
 			      }
 			    })
 			    .catch(function (error) {
@@ -141,24 +146,25 @@ class App extends React.Component{
 		return(<div>
 					<div>
 						<h1 className="text-center">Book Review Panel</h1>
-							<ul>
-								{
-									Object.keys(this.state.data).length!=0 &&
-									Object.keys(this.state.data)
-										.map(
-											i => <Book key={i} 
-													index={i} 
-													name={this.state.data[i].name} 
-													id={this.state.data[i].ISBN}
-													review={this.state.data[i].review} 
-													onSubmit={this.addReview}
-												/>
-										)
-								}
-							</ul>
-						</div>
-						<hr />
-						<AddBookForm onSubmit={this.addNewBook} />
+						<ul>
+							{
+								Object.keys(this.state.data).length!=0 &&
+								Object.keys(this.state.data)
+									.map(
+										i => <Book key={i}
+												index={i}
+												name={this.state.data[i].name}
+												id={this.state.data[i].ISBN}
+												review={this.state.data[i].review}
+												username={this.state.data[i].username}
+												onSubmit={this.addReview}
+											/>
+									)
+							}
+						</ul>
+					</div>
+					<hr />
+					<AddBookForm onSubmit={this.addNewBook} username={this.getCookie('username')}/>
 				</div>
 				);
 	}

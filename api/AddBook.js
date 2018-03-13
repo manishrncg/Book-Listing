@@ -1,7 +1,6 @@
 function checkIfBookExists(book_id, connection){
     var data = [book_id];
     return new Promise((resolve)=>{
-      console.log("SELECT * from books WHERE `book_id`=?", data);
         var query = connection.query("SELECT book_id from books WHERE `book_id`=?", data, function(err, result) {
           if(err){
             return false;          
