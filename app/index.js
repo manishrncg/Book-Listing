@@ -2,8 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import NotFound from './components/NotFound';
-import App from './components/App'
-import Login from './components/Login';
+import App from './components/App';
 
 class BookReviewPanel extends React.Component {
 
@@ -11,8 +10,7 @@ class BookReviewPanel extends React.Component {
     return (
       <BrowserRouter>
        <Switch>
-        <Route exact path='/' component={Login}/>
-        <Route path='/welcome/:username' component={App}/>
+        <Route exact path='/' component={App}/>
       </Switch>
       </BrowserRouter>);
       }

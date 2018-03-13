@@ -25,7 +25,8 @@ class Login extends React.Component {
       username: username
     })
     .then(function (response) {
-      self.props.history.push(`/welcome/${username}`);
+      //self.props.history.push(`/welcome/${username}`);
+      self.props.handleLogin();
     })
     .catch(function (error) {
     });
@@ -42,15 +43,17 @@ class Login extends React.Component {
   }
 
   render(){
-    return (<div>
-          <h1 className="text-center">Login page</h1>
-          <p>Enter username</p>
-          <form onSubmit={(e) => this.onSubmit(e)}>
+    return (
+          <div>
+            <h1 className="text-center">Login page</h1>
+            <p>Enter username</p>
+            <form onSubmit={(e) => this.onSubmit(e)}>
             <input type="text" ref={(input)=> { this.user_name = input }}/>
             <br />
-	         <input type="submit" />
-          </form> 
-	      </div>);
+            <input type="submit" />
+            </form>
+          </div>
+          );
   }
 }
 
